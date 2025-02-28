@@ -1,2 +1,2 @@
 # ping_pong
-o
+funciones hechas
