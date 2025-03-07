@@ -36,16 +36,19 @@ class Player2(GameSprite):
             self.rect.y -= self.speed_y
             
 class Ball(GameSprite):
-    global finish
+    global finish, puntos
     def update(self):
+        global puntos
+        
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
+        
         if self.rect.x > 670:
-            Game_over = font2.render('P2 LOSE',1,(63,72,204))
+            Game_over = font2.render('P2 LOSE',1,(255,255,255))
             window.blit(Game_over, (430,400))
             finish = True
         if self.rect.x < -10:
-            Game_over = font2.render('P1 LOSE',1,(255,127,39))
+            Game_over = font2.render('P1 LOSE',1,(255,255,0))
             window.blit(Game_over, (50,50))
             finish = True
             
@@ -56,29 +59,44 @@ class Ball(GameSprite):
             
         collision_ball_player1 = sprite.collide_rect(barrera1, self)
         collision_ball_player2 = sprite.collide_rect(barrera2, self)
+        
         if collision_ball_player1:
+            puntos += 1
             self.speed_x *= -1
+
         if collision_ball_player2:
             self.speed_x *= -1
+            puntos += 1
 
 font.init()
 font1 = font.SysFont('Arial',36)
 font2 = font.SysFont('Arial',70)
+
 win_height = 500
 win_width = 700
 window = display.set_mode((win_width,win_height))
 display.set_caption('Pong')
-background = transform.scale(image.load('pgfondo.png'), (win_width,win_height))
+
+background = transform.scale(image.load('espacio.jpg'), (win_width,win_height))
+
 clock = time.Clock()
+
+
+
 barrera1 = Player1('barrera1.png', 10, 200, 15, 105, 0, 15)
 barrera2 = Player2('barrera2.png', 675, 200, 15, 105, 0, 15)
-pelota = Ball('pelotapg.png', 322, 200, 40, 40, 8, 8)
+
+pelota = sprite.Group()
+pelota.add(Ball('lunaa.png', 322, 200, 80, 80, 5, 5))
 
 
+puntos = 0
 fps = 40
 game = True
 finish = False
 
+crear_bola = False 
+    
 while game:
     clock.tick(fps)
     for e in event.get():
@@ -90,18 +108,26 @@ while game:
         window.blit(background,(0, 0))
         
         barrera1.update()
-        
         barrera2.update()
         pelota.update()
         
+        if puntos %10 == 2:
+            crear_bola = True
+        if crear_bola and puntos %10 == 3:
+            pelota.add(Ball('lunaa.png', 200, 100, 80, 80, 5, 5))
+            crear_bola = False
+            
+            
+        
         barrera1.reset()
         barrera2.reset()
-        pelota.reset()
         
+        pelota.draw(window)
         
         display.update()
     elif finish == True:
         display.update()
+
         
     #else:  
         #time.delay(2000)
